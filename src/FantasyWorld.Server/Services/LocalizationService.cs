@@ -88,8 +88,30 @@ public class LocalizationService : ILocalizationService
         ["error.bad_request"]       = ("Yêu cầu không hợp lệ",              "Invalid request"),
         ["error.rate_limit"]        = ("Quá nhiều yêu cầu, vui lòng chờ",   "Too many requests, please wait"),
 
-        // Auction
-        ["auction.bid_placed"]      = ("Đã đặt giá thành công",             "Bid placed successfully"),
+        // Fishing
+        ["fishing.caught"]          = ("🐟 Câu được {name} ({weight}kg)!",    "🐟 Caught {name} ({weight}kg)!"),
+        ["fishing.escaped"]         = ("Con cá đã thoát mất!",                 "The fish got away!"),
+        ["fishing.nothing"]         = ("Không có gì cắn câu...",               "Nothing biting..."),
+        ["fishing.record"]          = ("🏆 Kỷ lục mới! {name} {weight}kg",    "🏆 New record! {name} {weight}kg"),
+
+        // Farm
+        ["farm.planted"]            = ("Đã trồng {crop}",                      "Planted {crop}"),
+        ["farm.watered"]            = ("Đã tưới nước",                         "Watered"),
+        ["farm.fertilized"]         = ("Đã bón phân, sẽ lớn nhanh hơn!",       "Fertilized, will grow faster!"),
+        ["farm.harvested"]          = ("Thu hoạch {crop} x{qty}!",             "Harvested {crop} x{qty}!"),
+        ["farm.not_ready"]          = ("Chưa đến lúc thu hoạch",               "Not ready to harvest yet"),
+        ["farm.wrong_season"]       = ("Cây này không trồng được mùa này",      "This crop can't grow this season"),
+
+        // World Event
+        ["event.joined"]            = ("Đã tham gia sự kiện {name}",           "Joined event {name}"),
+        ["event.reward_claimed"]    = ("Đã nhận thưởng sự kiện!",              "Event reward claimed!"),
+        ["event.ended"]             = ("Sự kiện đã kết thúc",                  "Event has ended"),
+
+        // Dungeon
+        ["dungeon.enter"]           = ("Đã vào hầm ngục {name}",              "Entered dungeon {name}"),
+        ["dungeon.completed"]       = ("🏆 Hoàn thành hầm ngục {name}!",      "🏆 Completed dungeon {name}!"),
+        ["dungeon.failed"]          = ("Hầm ngục thất bại...",                  "Dungeon failed..."),
+        ["dungeon.cooldown"]        = ("Cần chờ {hours} tiếng để vào lại",     "Need to wait {hours} hours"),
         ["auction.outbid"]          = ("Bạn đã bị outbid bởi người khác",   "You have been outbid"),
         ["auction.won"]             = ("Bạn đã thắng phiên đấu giá!",        "You won the auction!"),
         ["auction.expired"]         = ("Phiên đấu giá đã kết thúc",          "Auction has ended"),

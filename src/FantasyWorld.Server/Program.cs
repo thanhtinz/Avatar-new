@@ -103,10 +103,18 @@ try
     builder.Services.AddScoped<IMarketPriceService, MarketPriceService>();
     builder.Services.AddScoped<IRestaurantService, RestaurantService>();
 
+    // Phase 4 — World Systems
+    builder.Services.AddScoped<IPetService, PetService>();
+    builder.Services.AddScoped<IFishingService, FishingService>();
+    builder.Services.AddScoped<IFarmService, FarmService>();
+    builder.Services.AddScoped<IWorldEventService, WorldEventService>();
+    builder.Services.AddScoped<INpcAiService, NpcAiService>();
+
     // ─── Background Services ─────────────────────────────────
     builder.Services.AddHostedService<WorldTimeBackgroundService>();
     builder.Services.AddHostedService<DailyResetService>();
     builder.Services.AddHostedService<EconomyBackgroundService>();
+    builder.Services.AddHostedService<WorldBackgroundService>();
 
     // ─── Rate Limiting ───────────────────────────────────────
     builder.Services.AddRateLimiter(opt =>

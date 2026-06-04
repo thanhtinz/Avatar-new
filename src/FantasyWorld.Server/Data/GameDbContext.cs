@@ -87,6 +87,28 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
     public DbSet<MarketStallRental>      MarketStallRentals     => Set<MarketStallRental>();
     public DbSet<MarketListing>          MarketListings         => Set<MarketListing>();
 
+    // World - Phase 4
+    public DbSet<PetSkill>              PetSkills              => Set<PetSkill>();
+    public DbSet<PetCatchLog>           PetCatchLogs           => Set<PetCatchLog>();
+    public DbSet<WildPetSpawn>          WildPetSpawns          => Set<WildPetSpawn>();
+    public DbSet<FishSpecies>           FishSpecies            => Set<FishSpecies>();
+    public DbSet<FishingLog>            FishingLogs            => Set<FishingLog>();
+    public DbSet<Crop>                  Crops                  => Set<Crop>();
+    public DbSet<FarmPlot>              FarmPlots              => Set<FarmPlot>();
+    public DbSet<PlotCrop>              PlotCrops              => Set<PlotCrop>();
+    public DbSet<PetRanch>              PetRanches             => Set<PetRanch>();
+    public DbSet<RanchPet>              RanchPets              => Set<RanchPet>();
+    public DbSet<Dungeon>               Dungeons               => Set<Dungeon>();
+    public DbSet<DungeonRun>            DungeonRuns            => Set<DungeonRun>();
+    public DbSet<DungeonRunMember>      DungeonRunMembers      => Set<DungeonRunMember>();
+    public DbSet<WorldEventParticipant> WorldEventParticipants => Set<WorldEventParticipant>();
+    public DbSet<Npc>                   Npcs                   => Set<Npc>();
+    public DbSet<NpcAiProfile>          NpcAiProfiles          => Set<NpcAiProfile>();
+    public DbSet<NpcSchedule>           NpcSchedules           => Set<NpcSchedule>();
+    public DbSet<NpcCharacterRelation>  NpcCharacterRelations  => Set<NpcCharacterRelation>();
+    public DbSet<Monster>               Monsters               => Set<Monster>();
+    public DbSet<BattleLog>             BattleLogs             => Set<BattleLog>();
+
     protected override void OnModelCreating(ModelBuilder mb)
     {
         base.OnModelCreating(mb);
@@ -460,6 +482,126 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
              .HasForeignKey(l => l.RentalId).OnDelete(DeleteBehavior.Cascade);
             e.HasOne(l => l.Seller).WithMany()
              .HasForeignKey(l => l.SellerId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ─── Phase 4: World ──────────────────────────────────
+
+        mb.Entity<PetSkill>(e =>
+        {
+            e.Property(s => s.Element).HasConversion<string>();
+            e.HasOne(s => s.Species).WithMany()
+             .HasForeignKey(s => s.SpeciesId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<WildPetSpawn>(e =>
+        {
+            e.HasIndex(w => new { w.MapId, w.IsAlive });
+            e.HasOne(w => w.Species).WithMany()
+             .HasForeignKey(w => w.SpeciesId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<FishSpecies>(e =>
+            e.Property(f => f.Rarity).HasConversion<string>());
+
+        mb.Entity<FishingLog>(e =>
+        {
+            e.HasIndex(f => new { f.CharacterId, f.FishedAt });
+            e.HasOne(f => f.Character).WithMany()
+             .HasForeignKey(f => f.CharacterId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(f => f.Fish).WithMany()
+             .HasForeignKey(f => f.FishId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<Crop>(e =>
+        {
+            e.HasOne(c => c.HarvestItem).WithMany()
+             .HasForeignKey(c => c.HarvestItemId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(c => c.SeedItem).WithMany()
+             .HasForeignKey(c => c.SeedItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<FarmPlot>(e =>
+        {
+            e.HasOne(p => p.Owner).WithMany()
+             .HasForeignKey(p => p.OwnerId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<PlotCrop>(e =>
+        {
+            e.HasOne(pc => pc.Plot).WithOne(p => p.CurrentCrop)
+             .HasForeignKey<PlotCrop>(pc => pc.PlotId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(pc => pc.Crop).WithMany()
+             .HasForeignKey(pc => pc.CropId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<PetRanch>(e =>
+        {
+            e.HasOne(r => r.Owner).WithMany()
+             .HasForeignKey(r => r.OwnerId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<RanchPet>(e =>
+        {
+            e.HasOne(rp => rp.Ranch).WithMany(r => r.Pets)
+             .HasForeignKey(rp => rp.RanchId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(rp => rp.Pet).WithMany()
+             .HasForeignKey(rp => rp.PetId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<DungeonRun>(e =>
+        {
+            e.HasOne(r => r.Dungeon).WithMany(d => d.Runs)
+             .HasForeignKey(r => r.DungeonId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<DungeonRunMember>(e =>
+        {
+            e.HasOne(m => m.Run).WithMany(r => r.Members)
+             .HasForeignKey(m => m.RunId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(m => m.Character).WithMany()
+             .HasForeignKey(m => m.CharacterId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<WorldEventParticipant>(e =>
+        {
+            e.HasIndex(p => new { p.InstanceId, p.CharacterId }).IsUnique();
+            e.HasOne(p => p.Instance).WithMany()
+             .HasForeignKey(p => p.InstanceId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(p => p.Character).WithMany()
+             .HasForeignKey(p => p.CharacterId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<Npc>(e => e.HasIndex(n => n.MapId));
+
+        mb.Entity<NpcAiProfile>(e =>
+        {
+            e.HasOne(a => a.Npc).WithOne(n => n.AiProfile)
+             .HasForeignKey<NpcAiProfile>(a => a.NpcId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<NpcSchedule>(e =>
+        {
+            e.HasOne(s => s.Npc).WithMany(n => n.Schedules)
+             .HasForeignKey(s => s.NpcId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<NpcCharacterRelation>(e =>
+        {
+            e.HasIndex(r => new { r.NpcId, r.CharacterId }).IsUnique();
+            e.HasOne(r => r.Npc).WithMany(n => n.Relations)
+             .HasForeignKey(r => r.NpcId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(r => r.Character).WithMany()
+             .HasForeignKey(r => r.CharacterId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<Monster>(e =>
+            e.Property(m => m.Element).HasConversion<string>());
+
+        mb.Entity<BattleLog>(e =>
+        {
+            e.HasIndex(b => new { b.AttackerId, b.FoughtAt });
+            e.HasOne(b => b.Attacker).WithMany()
+             .HasForeignKey(b => b.AttackerId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
