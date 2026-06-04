@@ -1,0 +1,21 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+.vscode/
+*.log
+logs/
+
+## Secrets
+appsettings.Development.json
+appsettings.Production.json
+secrets.json
+
+## OS
+.DS_Store
+Thumbs.db
+
+## EF Migrations (optional - remove if you want to track)
+# src/*/Migrations/

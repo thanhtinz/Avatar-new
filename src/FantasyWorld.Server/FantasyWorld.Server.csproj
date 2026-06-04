@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>12</LangVersion>
+    <RootNamespace>FantasyWorld.Server</RootNamespace>
+    <UserSecretsId>fantasy-world-server</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- EF Core + MySQL -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.2" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+
+    <!-- MagicOnion (gRPC StreamingHub cho Unity) -->
+    <PackageReference Include="MagicOnion.Server" Version="6.1.1" />
+    <PackageReference Include="MessagePack" Version="2.5.187" />
+
+    <!-- Auth -->
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+
+    <!-- Logging -->
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.3" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+
+    <!-- Background jobs -->
+    <PackageReference Include="Quartz.AspNetCore" Version="3.13.1" />
+
+    <!-- Localisation -->
+    <PackageReference Include="Microsoft.Extensions.Localization" Version="8.0.11" />
+
+    <!-- Shared -->
+    <PackageReference Include="MagicOnion.Abstractions" Version="6.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FantasyWorld.Shared\FantasyWorld.Shared.csproj" />
+  </ItemGroup>
+
+  <!-- Localisation resx files -->
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\*.resx" />
+  </ItemGroup>
+</Project>
