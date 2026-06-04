@@ -87,6 +87,21 @@ public class LocalizationService : ILocalizationService
         ["error.forbidden"]         = ("Bạn không có quyền thực hiện",       "Permission denied"),
         ["error.bad_request"]       = ("Yêu cầu không hợp lệ",              "Invalid request"),
         ["error.rate_limit"]        = ("Quá nhiều yêu cầu, vui lòng chờ",   "Too many requests, please wait"),
+
+        // Party
+        ["party.created"]           = ("Đã tạo tổ đội",                     "Party created"),
+        ["party.joined"]            = ("Đã gia nhập tổ đội",                "Joined the party"),
+        ["party.left"]              = ("Đã rời khỏi tổ đội",               "You left the party"),
+        ["party.disbanded"]         = ("Tổ đội đã giải tán",                "Party disbanded"),
+        ["party.full"]              = ("Tổ đội đã đủ người",                "Party is full"),
+        ["party.invite_sent"]       = ("Đã gửi lời mời đến {name}",         "Invite sent to {name}"),
+        ["party.not_member"]        = ("Bạn không trong tổ đội",            "You are not in a party"),
+
+        // Relationship
+        ["rel.propose_sent"]        = ("Đã gửi lời đề nghị quan hệ",        "Relationship request sent"),
+        ["rel.already_exists"]      = ("Quan hệ đã tồn tại",               "Relationship already exists"),
+        ["rel.limit_reached"]       = ("Đã đạt giới hạn loại quan hệ này", "Relationship limit reached"),
+        ["rel.removed"]             = ("Đã hủy quan hệ",                    "Relationship removed"),
     };
 
     public string Get(string key, string lang = "vi", object? args = null)

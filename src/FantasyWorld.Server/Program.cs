@@ -90,6 +90,13 @@ try
     builder.Services.AddScoped<ICharacterService, CharacterService>();
     builder.Services.AddSingleton<ILocalizationService, LocalizationService>();
 
+    // Phase 2 — Social
+    builder.Services.AddScoped<IFriendService, FriendService>();
+    builder.Services.AddScoped<IClanService, ClanService>();
+    builder.Services.AddScoped<IPartyService, PartyService>();
+    builder.Services.AddScoped<IRelationshipService, RelationshipService>();
+    builder.Services.AddSingleton<ISocialEventPusher, SocialEventPusher>();
+
     // ─── Background Services ─────────────────────────────────
     builder.Services.AddHostedService<WorldTimeBackgroundService>();
     builder.Services.AddHostedService<DailyResetService>();

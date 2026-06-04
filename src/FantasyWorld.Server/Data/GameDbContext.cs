@@ -55,6 +55,17 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
     public DbSet<FishingRecord>     FishingRecords     => Set<FishingRecord>();
     public DbSet<CitizenCard>       CitizenCards       => Set<CitizenCard>();
 
+    // Social - Phase 2
+    public DbSet<FriendRequest>  FriendRequests  => Set<FriendRequest>();
+    public DbSet<Relationship>   Relationships   => Set<Relationship>();
+    public DbSet<Party>          Parties         => Set<Party>();
+    public DbSet<PartyMember>    PartyMembers    => Set<PartyMember>();
+    public DbSet<PartyInvite>    PartyInvites    => Set<PartyInvite>();
+    public DbSet<ClanQuest>      ClanQuests      => Set<ClanQuest>();
+    public DbSet<ClanBoss>       ClanBosses      => Set<ClanBoss>();
+    public DbSet<ClanStorage>    ClanStorages    => Set<ClanStorage>();
+    public DbSet<CharacterBlock> CharacterBlocks => Set<CharacterBlock>();
+
     protected override void OnModelCreating(ModelBuilder mb)
     {
         base.OnModelCreating(mb);
@@ -239,6 +250,81 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
              .WithMany()
              .HasForeignKey(p => p.ToMapId)
              .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ─── Phase 2: Social ─────────────────────────────────
+
+        mb.Entity<FriendRequest>(e =>
+        {
+            e.HasIndex(f => new { f.FromId, f.ToId }).IsUnique();
+            e.HasOne(f => f.From).WithMany()
+             .HasForeignKey(f => f.FromId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(f => f.To).WithMany()
+             .HasForeignKey(f => f.ToId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<Relationship>(e =>
+        {
+            e.Property(r => r.RelType).HasConversion<string>();
+            e.HasIndex(r => new { r.CharacterA, r.CharacterB, r.RelType }).IsUnique();
+            e.HasOne(r => r.A).WithMany()
+             .HasForeignKey(r => r.CharacterA).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(r => r.B).WithMany()
+             .HasForeignKey(r => r.CharacterB).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<Party>(e =>
+        {
+            e.HasOne(p => p.Leader).WithMany()
+             .HasForeignKey(p => p.LeaderId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<PartyMember>(e =>
+        {
+            e.HasIndex(pm => new { pm.PartyId, pm.CharacterId }).IsUnique();
+            e.HasOne(pm => pm.Party).WithMany(p => p.Members)
+             .HasForeignKey(pm => pm.PartyId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(pm => pm.Character).WithMany()
+             .HasForeignKey(pm => pm.CharacterId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<PartyInvite>(e =>
+        {
+            e.HasOne(pi => pi.Party).WithMany()
+             .HasForeignKey(pi => pi.PartyId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(pi => pi.Inviter).WithMany()
+             .HasForeignKey(pi => pi.InviterId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(pi => pi.Invitee).WithMany()
+             .HasForeignKey(pi => pi.InviteeId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<ClanQuest>(e =>
+        {
+            e.HasOne(cq => cq.Clan).WithMany()
+             .HasForeignKey(cq => cq.ClanId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<ClanBoss>(e =>
+        {
+            e.HasOne(cb => cb.Clan).WithMany()
+             .HasForeignKey(cb => cb.ClanId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<ClanStorage>(e =>
+        {
+            e.HasOne(cs => cs.Clan).WithMany()
+             .HasForeignKey(cs => cs.ClanId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(cs => cs.Item).WithMany()
+             .HasForeignKey(cs => cs.ItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<CharacterBlock>(e =>
+        {
+            e.HasIndex(b => new { b.BlockerId, b.BlockedId }).IsUnique();
+            e.HasOne(b => b.Blocker).WithMany()
+             .HasForeignKey(b => b.BlockerId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(b => b.Blocked).WithMany()
+             .HasForeignKey(b => b.BlockedId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

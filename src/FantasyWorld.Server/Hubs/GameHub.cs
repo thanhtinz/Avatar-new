@@ -3,6 +3,7 @@ using MagicOnion.Server.Hubs;
 using Microsoft.EntityFrameworkCore;
 using FantasyWorld.Server.Data;
 using FantasyWorld.Server.Services;
+using FantasyWorld.Server.Services.Social;
 using FantasyWorld.Shared.DTOs;
 using FantasyWorld.Shared.Enums;
 using FantasyWorld.Shared.Interfaces;
@@ -248,10 +249,84 @@ public class GameHub(
     }
 
     // ─── Party ───────────────────────────────────────────────
-    public Task CreatePartyAsync()  => Task.CompletedTask; // Phase 2
-    public Task JoinPartyAsync(long partyId)  => Task.CompletedTask;
-    public Task LeavePartyAsync()   => Task.CompletedTask;
-    public Task InviteToPartyAsync(long targetCharId) => Task.CompletedTask;
+    public async Task CreatePartyAsync()
+    {
+        if (_charId == 0) return;
+        var partySvc = Context.ServiceLocator.GetRequiredService<IPartyService>();
+        var (ok, msg, partyId) = await partySvc.CreateAsync(_charId, 4, _lang);
+        if (!ok) { Client.OnError(new ErrorDto("PARTY_ERROR", msg, msg)); return; }
+        await Group.AddAsync($"party:{partyId}");
+        state.JoinParty(_charId, partyId);
+        var party = await partySvc.GetPartyAsync(partyId);
+        if (party is not null) Client.OnPartyUpdate(party.Members.Select(m => m.CharId).ToList());
+    }
+
+    public async Task JoinPartyAsync(long partyId)
+    {
+        if (_charId == 0) return;
+        var partySvc = Context.ServiceLocator.GetRequiredService<IPartyService>();
+        var (ok, msg) = await partySvc.JoinAsync(_charId, (int)partyId, _lang);
+        if (!ok) { Client.OnError(new ErrorDto("PARTY_ERROR", msg, msg)); return; }
+        await Group.AddAsync($"party:{partyId}");
+        state.JoinParty(_charId, partyId);
+        var party = await partySvc.GetPartyAsync(partyId);
+        if (party is not null)
+        {
+            BroadcastToGroup($"party:{partyId}")
+                .OnPartyUpdate(party.Members.Select(m => m.CharId).ToList());
+        }
+    }
+
+    public async Task LeavePartyAsync()
+    {
+        if (_charId == 0) return;
+        var partySvc = Context.ServiceLocator.GetRequiredService<IPartyService>();
+        var partyId  = await partySvc.GetCharPartyIdAsync(_charId);
+        var (ok, _) = await partySvc.LeaveAsync(_charId, _lang);
+        if (ok && partyId.HasValue)
+        {
+            await Group.RemoveAsync($"party:{partyId}");
+            state.LeaveParty(_charId, partyId.Value);
+            var party = await partySvc.GetPartyAsync(partyId.Value);
+            if (party is not null)
+                BroadcastToGroup($"party:{partyId}")
+                    .OnPartyUpdate(party.Members.Select(m => m.CharId).ToList());
+        }
+    }
+
+    public async Task InviteToPartyAsync(long targetCharId)
+    {
+        if (_charId == 0) return;
+        var partySvc = Context.ServiceLocator.GetRequiredService<IPartyService>();
+        var player   = state.GetByConnectionId(ConnectionId);
+        if (player is null) return;
+
+        var partyId = await partySvc.GetCharPartyIdAsync(_charId);
+        if (partyId is null)
+        {
+            // Auto-create party khi invite
+            var (ok, _, pid) = await partySvc.CreateAsync(_charId, 4, _lang);
+            if (!ok) return;
+            partyId = pid;
+            await Group.AddAsync($"party:{partyId}");
+            state.JoinParty(_charId, partyId.Value);
+        }
+
+        var (inviteOk, invMsg) = await partySvc.InviteAsync(
+            partyId.Value, _charId, targetCharId, _lang);
+
+        if (!inviteOk) { Client.OnError(new ErrorDto("INVITE_ERROR", invMsg, invMsg)); return; }
+
+        // Push invite đến target nếu online
+        var targetPlayer = state.GetByCharId(targetCharId);
+        if (targetPlayer is not null)
+        {
+            var inviter = state.GetByConnectionId(ConnectionId);
+            var party   = await partySvc.GetPartyAsync(partyId.Value);
+            BroadcastToGroup($"char:{targetCharId}")
+                .OnPartyInvite(_charId, inviter?.Name ?? "");
+        }
+    }
 
     // ─── Disconnect ──────────────────────────────────────────
     protected override async ValueTask OnDisconnected()
