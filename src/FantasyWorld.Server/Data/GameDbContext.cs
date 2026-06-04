@@ -66,6 +66,27 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
     public DbSet<ClanStorage>    ClanStorages    => Set<ClanStorage>();
     public DbSet<CharacterBlock> CharacterBlocks => Set<CharacterBlock>();
 
+    // Economy - Phase 3
+    public DbSet<NpcShop>                NpcShops               => Set<NpcShop>();
+    public DbSet<NpcShopItem>            NpcShopItems           => Set<NpcShopItem>();
+    public DbSet<PlayerShop>             PlayerShops            => Set<PlayerShop>();
+    public DbSet<PlayerShopListing>      PlayerShopListings     => Set<PlayerShopListing>();
+    public DbSet<PlayerShopTransaction>  PlayerShopTransactions => Set<PlayerShopTransaction>();
+    public DbSet<AuctionListing>         AuctionListings        => Set<AuctionListing>();
+    public DbSet<AuctionBid>             AuctionBids            => Set<AuctionBid>();
+    public DbSet<MarketPrice>            MarketPrices           => Set<MarketPrice>();
+    public DbSet<PriceHistory>           PriceHistory           => Set<PriceHistory>();
+    public DbSet<SeasonalPriceModifier>  SeasonalPriceModifiers => Set<SeasonalPriceModifier>();
+    public DbSet<RestaurantType>         RestaurantTypes        => Set<RestaurantType>();
+    public DbSet<RestaurantApplication>  RestaurantApplications => Set<RestaurantApplication>();
+    public DbSet<RestaurantVote>         RestaurantVotes        => Set<RestaurantVote>();
+    public DbSet<Restaurant>             Restaurants            => Set<Restaurant>();
+    public DbSet<RestaurantMenuItem>     RestaurantMenuItems    => Set<RestaurantMenuItem>();
+    public DbSet<RestaurantOrder>        RestaurantOrders       => Set<RestaurantOrder>();
+    public DbSet<MarketStall>            MarketStalls           => Set<MarketStall>();
+    public DbSet<MarketStallRental>      MarketStallRentals     => Set<MarketStallRental>();
+    public DbSet<MarketListing>          MarketListings         => Set<MarketListing>();
+
     protected override void OnModelCreating(ModelBuilder mb)
     {
         base.OnModelCreating(mb);
@@ -325,6 +346,120 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
              .HasForeignKey(b => b.BlockerId).OnDelete(DeleteBehavior.Cascade);
             e.HasOne(b => b.Blocked).WithMany()
              .HasForeignKey(b => b.BlockedId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        // ─── Phase 3: Economy ────────────────────────────────
+
+        mb.Entity<NpcShopItem>(e =>
+        {
+            e.HasOne(i => i.Shop).WithMany(s => s.Items)
+             .HasForeignKey(i => i.ShopId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(i => i.Item).WithMany()
+             .HasForeignKey(i => i.ItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<PlayerShop>(e =>
+        {
+            e.HasOne(s => s.Owner).WithMany()
+             .HasForeignKey(s => s.OwnerId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<PlayerShopListing>(e =>
+        {
+            e.HasIndex(l => new { l.ShopId, l.IsSold });
+            e.HasOne(l => l.Shop).WithMany(s => s.Listings)
+             .HasForeignKey(l => l.ShopId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(l => l.Item).WithMany()
+             .HasForeignKey(l => l.ItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<AuctionListing>(e =>
+        {
+            e.HasIndex(a => new { a.Status, a.EndsAt });
+            e.HasOne(a => a.Seller).WithMany()
+             .HasForeignKey(a => a.SellerId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(a => a.Item).WithMany()
+             .HasForeignKey(a => a.ItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<AuctionBid>(e =>
+        {
+            e.HasIndex(b => new { b.AuctionId, b.IsWinning });
+            e.HasOne(b => b.Auction).WithMany(a => a.Bids)
+             .HasForeignKey(b => b.AuctionId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(b => b.Bidder).WithMany()
+             .HasForeignKey(b => b.BidderId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<MarketPrice>(e =>
+        {
+            e.HasIndex(m => m.ItemId).IsUnique();
+            e.HasOne(m => m.Item).WithMany()
+             .HasForeignKey(m => m.ItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<PriceHistory>(e =>
+        {
+            e.HasIndex(h => new { h.ItemId, h.RecordedAt });
+            e.HasOne(h => h.Item).WithMany()
+             .HasForeignKey(h => h.ItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<RestaurantApplication>(e =>
+        {
+            e.HasOne(a => a.Applicant).WithMany()
+             .HasForeignKey(a => a.ApplicantId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(a => a.Type).WithMany(t => t.Applications)
+             .HasForeignKey(a => a.TypeId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<RestaurantVote>(e =>
+        {
+            e.HasIndex(v => new { v.ApplicationId, v.VoterId }).IsUnique();
+            e.HasOne(v => v.Application).WithMany(a => a.Votes)
+             .HasForeignKey(v => v.ApplicationId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(v => v.Voter).WithMany()
+             .HasForeignKey(v => v.VoterId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<Restaurant>(e =>
+        {
+            e.HasOne(r => r.Owner).WithMany()
+             .HasForeignKey(r => r.OwnerId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne<RestaurantApplication>().WithOne(a => a.Restaurant)
+             .HasForeignKey<Restaurant>(r => r.ApplicationId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<RestaurantMenuItem>(e =>
+        {
+            e.HasOne(m => m.Restaurant).WithMany(r => r.MenuItems)
+             .HasForeignKey(m => m.RestaurantId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<RestaurantOrder>(e =>
+        {
+            e.HasOne(o => o.Restaurant).WithMany(r => r.Orders)
+             .HasForeignKey(o => o.RestaurantId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(o => o.MenuItem).WithMany()
+             .HasForeignKey(o => o.MenuItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<MarketStallRental>(e =>
+        {
+            e.HasIndex(r => new { r.StallId, r.IsActive });
+            e.HasOne(r => r.Stall).WithOne(s => s.CurrentRental)
+             .HasForeignKey<MarketStallRental>(r => r.StallId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(r => r.Renter).WithMany()
+             .HasForeignKey(r => r.RenterId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<MarketListing>(e =>
+        {
+            e.HasIndex(l => new { l.ListingType, l.Price });
+            e.HasOne(l => l.Rental).WithMany(r => r.Listings)
+             .HasForeignKey(l => l.RentalId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(l => l.Seller).WithMany()
+             .HasForeignKey(l => l.SellerId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 }

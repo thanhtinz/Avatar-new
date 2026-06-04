@@ -97,9 +97,16 @@ try
     builder.Services.AddScoped<IRelationshipService, RelationshipService>();
     builder.Services.AddSingleton<ISocialEventPusher, SocialEventPusher>();
 
+    // Phase 3 — Economy
+    builder.Services.AddScoped<IShopService, ShopService>();
+    builder.Services.AddScoped<IAuctionService, AuctionService>();
+    builder.Services.AddScoped<IMarketPriceService, MarketPriceService>();
+    builder.Services.AddScoped<IRestaurantService, RestaurantService>();
+
     // ─── Background Services ─────────────────────────────────
     builder.Services.AddHostedService<WorldTimeBackgroundService>();
     builder.Services.AddHostedService<DailyResetService>();
+    builder.Services.AddHostedService<EconomyBackgroundService>();
 
     // ─── Rate Limiting ───────────────────────────────────────
     builder.Services.AddRateLimiter(opt =>

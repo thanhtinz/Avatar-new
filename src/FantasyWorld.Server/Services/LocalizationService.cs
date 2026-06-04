@@ -88,8 +88,20 @@ public class LocalizationService : ILocalizationService
         ["error.bad_request"]       = ("Yêu cầu không hợp lệ",              "Invalid request"),
         ["error.rate_limit"]        = ("Quá nhiều yêu cầu, vui lòng chờ",   "Too many requests, please wait"),
 
-        // Party
-        ["party.created"]           = ("Đã tạo tổ đội",                     "Party created"),
+        // Auction
+        ["auction.bid_placed"]      = ("Đã đặt giá thành công",             "Bid placed successfully"),
+        ["auction.outbid"]          = ("Bạn đã bị outbid bởi người khác",   "You have been outbid"),
+        ["auction.won"]             = ("Bạn đã thắng phiên đấu giá!",        "You won the auction!"),
+        ["auction.expired"]         = ("Phiên đấu giá đã kết thúc",          "Auction has ended"),
+        ["auction.cancelled"]       = ("Đã hủy phiên đấu giá",               "Auction cancelled"),
+        ["auction.min_bid"]         = ("Giá đặt phải cao hơn {min}",         "Bid must be higher than {min}"),
+
+        // Restaurant
+        ["restaurant.applied"]      = ("Đơn mở quán đã được gửi! Chờ vote", "Application submitted! Waiting for votes"),
+        ["restaurant.approved"]     = ("Quán {name} đã được phê duyệt!",     "Restaurant {name} has been approved!"),
+        ["restaurant.rejected"]     = ("Đơn mở quán không đủ phiếu",         "Application did not get enough votes"),
+        ["restaurant.voted"]        = ("Đã bỏ phiếu cho {name}",             "Voted for {name}"),
+        ["restaurant.order_success"]= ("Đã đặt món thành công!",              "Order placed successfully!"),
         ["party.joined"]            = ("Đã gia nhập tổ đội",                "Joined the party"),
         ["party.left"]              = ("Đã rời khỏi tổ đội",               "You left the party"),
         ["party.disbanded"]         = ("Tổ đội đã giải tán",                "Party disbanded"),
