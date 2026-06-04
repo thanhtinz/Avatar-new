@@ -156,6 +156,50 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
     public DbSet<PhotoAlbum>             PhotoAlbums            => Set<PhotoAlbum>();
     public DbSet<AlbumPhoto>             AlbumPhotos            => Set<AlbumPhoto>();
 
+    // Gameplay - Phase 8
+    public DbSet<CharacterFaction>           CharacterFactions          => Set<CharacterFaction>();
+    public DbSet<FactionQuest>               FactionQuests              => Set<FactionQuest>();
+    public DbSet<CharacterFactionQuest>      CharacterFactionQuests     => Set<CharacterFactionQuest>();
+    public DbSet<FactionShopItem>            FactionShopItems           => Set<FactionShopItem>();
+    public DbSet<FactionWar>                 FactionWars                => Set<FactionWar>();
+    public DbSet<CompanyType>                CompanyTypes               => Set<CompanyType>();
+    public DbSet<CompanyEmployee>            CompanyEmployees           => Set<CompanyEmployee>();
+    public DbSet<CompanyTransaction>         CompanyTransactions        => Set<CompanyTransaction>();
+    public DbSet<LandZone>                   LandZones                  => Set<LandZone>();
+    public DbSet<LandTransferHistory>        LandTransferHistories      => Set<LandTransferHistory>();
+    public DbSet<HouseRating>                HouseRatings               => Set<HouseRating>();
+    public DbSet<Museum>                     Museums                    => Set<Museum>();
+    public DbSet<MuseumExhibit>              MuseumExhibits             => Set<MuseumExhibit>();
+    public DbSet<MuseumDonation>             MuseumDonations            => Set<MuseumDonation>();
+    public DbSet<Landmark>                   Landmarks                  => Set<Landmark>();
+    public DbSet<TravelPassport>             TravelPassports            => Set<TravelPassport>();
+    public DbSet<TravelPassportStamp>        TravelPassportStamps       => Set<TravelPassportStamp>();
+    public DbSet<RegionalSpecialty>          RegionalSpecialties        => Set<RegionalSpecialty>();
+    public DbSet<NewsArticle>                NewsArticles               => Set<NewsArticle>();
+    public DbSet<TreasureHunt>               TreasureHunts              => Set<TreasureHunt>();
+    public DbSet<GuildTerritory>             GuildTerritories           => Set<GuildTerritory>();
+    public DbSet<TerritoryBuilding>          TerritoryBuildings         => Set<TerritoryBuilding>();
+    public DbSet<RareProfession>             RareProfessions            => Set<RareProfession>();
+    public DbSet<CharacterRareProfession>    CharacterRareProfessions   => Set<CharacterRareProfession>();
+    public DbSet<Deity>                      Deities                    => Set<Deity>();
+    public DbSet<CharacterDeity>             CharacterDeities           => Set<CharacterDeity>();
+    public DbSet<DeityQuest>                 DeityQuests                => Set<DeityQuest>();
+    public DbSet<CivilProfession>            CivilProfessions           => Set<CivilProfession>();
+    public DbSet<CharacterCivilProfession>   CharacterCivilProfessions  => Set<CharacterCivilProfession>();
+    public DbSet<LeaderboardSnapshot>        LeaderboardSnapshots       => Set<LeaderboardSnapshot>();
+    public DbSet<EndgameRealm>               EndgameRealms              => Set<EndgameRealm>();
+    public DbSet<CharacterEndgameRealm>      CharacterEndgameRealms     => Set<CharacterEndgameRealm>();
+    public DbSet<Festival>                   Festivals                  => Set<Festival>();
+    public DbSet<FestivalTask>               FestivalTasks              => Set<FestivalTask>();
+    public DbSet<CharacterFestivalParticipant> CharacterFestivalParticipants => Set<CharacterFestivalParticipant>();
+    public DbSet<CharacterFestivalTask>      CharacterFestivalTasks     => Set<CharacterFestivalTask>();
+    public DbSet<UgcContent>                 UgcContents                => Set<UgcContent>();
+    public DbSet<UgcRating>                  UgcRatings                 => Set<UgcRating>();
+    public DbSet<CitizenCardView>            CitizenCardViews           => Set<CitizenCardView>();
+    public DbSet<Hotel>                      Hotels                     => Set<Hotel>();
+    public DbSet<HotelRoom>                  HotelRooms                 => Set<HotelRoom>();
+    public DbSet<HotelRental>                HotelRentals               => Set<HotelRental>();
+
     protected override void OnModelCreating(ModelBuilder mb)
     {
         base.OnModelCreating(mb);

@@ -129,12 +129,34 @@ try
     builder.Services.AddScoped<IPerformanceService, PerformanceService>();
     builder.Services.AddScoped<IPhotoService, PhotoService>();
 
+    // Phase 8 — Gameplay Systems
+    builder.Services.AddScoped<IFactionService, FactionService>();
+    builder.Services.AddScoped<ICompanyService, CompanyService>();
+    builder.Services.AddScoped<IRealEstateService, RealEstateService>();
+    builder.Services.AddScoped<IMuseumService, MuseumService>();
+    builder.Services.AddScoped<ITravelService, TravelService>();
+    builder.Services.AddScoped<INewsService, NewsService>();
+    builder.Services.AddScoped<IServerTreasureHuntService, ServerTreasureHuntService>();
+    builder.Services.AddScoped<IGuildTerritoryService, GuildTerritoryService>();
+    builder.Services.AddScoped<IRareProfessionService, RareProfessionService>();
+    builder.Services.AddScoped<IDeityService, DeityService>();
+    builder.Services.AddScoped<ICivilProfessionService, CivilProfessionService>();
+    builder.Services.AddScoped<ILeaderboardService, LeaderboardService>();
+    builder.Services.AddScoped<IEndgameRealmService, EndgameRealmService>();
+    builder.Services.AddScoped<ISeasonService, SeasonService>();
+    builder.Services.AddScoped<IFestivalService, FestivalService>();
+    builder.Services.AddScoped<IUgcService, UgcService>();
+    builder.Services.AddScoped<ICitizenCardService, CitizenCardService>();
+    builder.Services.AddScoped<IHotelService, HotelService>();
+    builder.Services.AddScoped<IMarketStallService, MarketStallService>();
+
     // ─── Background Services ─────────────────────────────────
     builder.Services.AddHostedService<WorldTimeBackgroundService>();
     builder.Services.AddHostedService<DailyResetService>();
     builder.Services.AddHostedService<EconomyBackgroundService>();
     builder.Services.AddHostedService<WorldBackgroundService>();
     builder.Services.AddHostedService<EntertainmentBackgroundService>();
+    builder.Services.AddHostedService<GameplayBackgroundService>();
 
     // ─── Rate Limiting ───────────────────────────────────────
     builder.Services.AddRateLimiter(opt =>
