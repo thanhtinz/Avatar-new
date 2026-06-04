@@ -131,6 +131,31 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
     public DbSet<CharacterReputation>         CharacterReputations         => Set<CharacterReputation>();
     public DbSet<CharacterCard>               CharacterCards               => Set<CharacterCard>();
 
+    // Entertainment - Phase 6
+    public DbSet<CasinoGame>             CasinoGames            => Set<CasinoGame>();
+    public DbSet<CasinoLog>              CasinoLogs             => Set<CasinoLog>();
+    public DbSet<CasinoDailyLimit>       CasinoDailyLimits      => Set<CasinoDailyLimit>();
+    public DbSet<MiniGame>               MiniGames              => Set<MiniGame>();
+    public DbSet<MiniGameScore>          MiniGameScores         => Set<MiniGameScore>();
+    public DbSet<MountRaceTrack>         MountRaceTracks        => Set<MountRaceTrack>();
+    public DbSet<MountRace>              MountRaces             => Set<MountRace>();
+    public DbSet<MountRaceEntry>         MountRaceEntries       => Set<MountRaceEntry>();
+    public DbSet<FashionItem>            FashionItems           => Set<FashionItem>();
+    public DbSet<WardrobeItem>           WardrobeItems          => Set<WardrobeItem>();
+    public DbSet<CharacterOutfit>        CharacterOutfits       => Set<CharacterOutfit>();
+    public DbSet<OutfitPreset>           OutfitPresets          => Set<OutfitPreset>();
+    public DbSet<FashionDesign>          FashionDesigns         => Set<FashionDesign>();
+    public DbSet<FashionDesignPurchase>  FashionDesignPurchases => Set<FashionDesignPurchase>();
+    public DbSet<PerformanceStage>       PerformanceStages      => Set<PerformanceStage>();
+    public DbSet<Performance>            Performances           => Set<Performance>();
+    public DbSet<PerformanceTip>         PerformanceTips        => Set<PerformanceTip>();
+    public DbSet<PerformanceGroupMember> PerformanceGroupMembers => Set<PerformanceGroupMember>();
+    public DbSet<PlayerWork>             PlayerWorks            => Set<PlayerWork>();
+    public DbSet<PhotoFrame>             PhotoFrames            => Set<PhotoFrame>();
+    public DbSet<Photo>                  Photos                 => Set<Photo>();
+    public DbSet<PhotoAlbum>             PhotoAlbums            => Set<PhotoAlbum>();
+    public DbSet<AlbumPhoto>             AlbumPhotos            => Set<AlbumPhoto>();
+
     protected override void OnModelCreating(ModelBuilder mb)
     {
         base.OnModelCreating(mb);
@@ -764,6 +789,151 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
             e.HasIndex(cc => new { cc.CharacterId, cc.CardId }).IsUnique();
             e.HasOne(cc => cc.Character).WithMany()
              .HasForeignKey(cc => cc.CharacterId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ─── Phase 6: Entertainment ──────────────────────────
+
+        mb.Entity<CasinoLog>(e =>
+        {
+            e.HasIndex(l => new { l.CharacterId, l.PlayedAt });
+            e.HasOne(l => l.Character).WithMany()
+             .HasForeignKey(l => l.CharacterId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(l => l.Game).WithMany(g => g.Logs)
+             .HasForeignKey(l => l.GameId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<CasinoDailyLimit>(e =>
+        {
+            e.HasIndex(l => new { l.CharacterId, l.Date }).IsUnique();
+            e.HasOne(l => l.Character).WithMany()
+             .HasForeignKey(l => l.CharacterId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<MiniGameScore>(e =>
+        {
+            e.HasIndex(s => new { s.CharacterId, s.MiniGameId }).IsUnique();
+            e.HasOne(s => s.Character).WithMany()
+             .HasForeignKey(s => s.CharacterId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(s => s.MiniGame).WithMany(g => g.Scores)
+             .HasForeignKey(s => s.MiniGameId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<MountRace>(e =>
+        {
+            e.HasOne(r => r.Track).WithMany(t => t.Races)
+             .HasForeignKey(r => r.TrackId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<MountRaceEntry>(e =>
+        {
+            e.HasIndex(e2 => new { e2.RaceId, e2.CharacterId }).IsUnique();
+            e.HasOne(e2 => e2.Race).WithMany(r => r.Entries)
+             .HasForeignKey(e2 => e2.RaceId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(e2 => e2.Character).WithMany()
+             .HasForeignKey(e2 => e2.CharacterId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(e2 => e2.MountPet).WithMany()
+             .HasForeignKey(e2 => e2.MountPetId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<FashionItem>(e =>
+        {
+            e.HasOne(f => f.Designer).WithMany()
+             .HasForeignKey(f => f.DesignerId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<WardrobeItem>(e =>
+        {
+            e.HasIndex(w => new { w.CharacterId, w.FashionItemId }).IsUnique();
+            e.HasOne(w => w.Character).WithMany()
+             .HasForeignKey(w => w.CharacterId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(w => w.FashionItem).WithMany()
+             .HasForeignKey(w => w.FashionItemId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<CharacterOutfit>(e =>
+        {
+            e.HasOne(o => o.Character).WithMany()
+             .HasForeignKey(o => o.CharacterId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<OutfitPreset>(e =>
+        {
+            e.HasIndex(p => new { p.CharacterId, p.SlotNumber }).IsUnique();
+            e.HasOne(p => p.Character).WithMany()
+             .HasForeignKey(p => p.CharacterId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<FashionDesign>(e =>
+        {
+            e.HasIndex(d => d.Status);
+            e.HasOne(d => d.Designer).WithMany()
+             .HasForeignKey(d => d.DesignerId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<FashionDesignPurchase>(e =>
+        {
+            e.HasIndex(p => new { p.DesignId, p.BuyerId }).IsUnique();
+            e.HasOne(p => p.Design).WithMany(d => d.Purchases)
+             .HasForeignKey(p => p.DesignId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(p => p.Buyer).WithMany()
+             .HasForeignKey(p => p.BuyerId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<Performance>(e =>
+        {
+            e.HasIndex(p => new { p.StageId, p.Status });
+            e.HasOne(p => p.Performer).WithMany()
+             .HasForeignKey(p => p.PerformerId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(p => p.Stage).WithMany(s => s.Performances)
+             .HasForeignKey(p => p.StageId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<PerformanceTip>(e =>
+        {
+            e.HasOne(t => t.Performance).WithMany(p => p.Tips)
+             .HasForeignKey(t => t.PerformanceId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(t => t.Tipper).WithMany()
+             .HasForeignKey(t => t.TipperId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<PerformanceGroupMember>(e =>
+        {
+            e.HasIndex(m => new { m.PerformanceId, m.CharacterId }).IsUnique();
+            e.HasOne(m => m.Performance).WithMany(p => p.Members)
+             .HasForeignKey(m => m.PerformanceId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(m => m.Character).WithMany()
+             .HasForeignKey(m => m.CharacterId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<Photo>(e =>
+        {
+            e.HasIndex(p => new { p.TakerId, p.TakenAt });
+            e.HasOne(p => p.Taker).WithMany()
+             .HasForeignKey(p => p.TakerId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(p => p.Frame).WithMany()
+             .HasForeignKey(p => p.FrameId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<PhotoAlbum>(e =>
+        {
+            e.HasOne(a => a.Owner).WithMany()
+             .HasForeignKey(a => a.OwnerId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<AlbumPhoto>(e =>
+        {
+            e.HasKey(ap => new { ap.AlbumId, ap.PhotoId });
+            e.HasOne(ap => ap.Album).WithMany(a => a.Photos)
+             .HasForeignKey(ap => ap.AlbumId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(ap => ap.Photo).WithMany()
+             .HasForeignKey(ap => ap.PhotoId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<PlayerWork>(e =>
+        {
+            e.HasIndex(w => new { w.WorkType, w.Likes });
+            e.HasOne(w => w.Creator).WithMany()
+             .HasForeignKey(w => w.CreatorId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

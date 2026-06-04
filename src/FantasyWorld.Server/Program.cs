@@ -8,6 +8,11 @@ using FantasyWorld.Server.BackgroundServices;
 using FantasyWorld.Server.Data;
 using FantasyWorld.Server.Hubs;
 using FantasyWorld.Server.Services;
+using FantasyWorld.Server.Services.Social;
+using FantasyWorld.Server.Services.Economy;
+using FantasyWorld.Server.Services.World;
+using FantasyWorld.Server.Services.Content;
+using FantasyWorld.Server.Services.Entertainment;
 
 // ─── Serilog bootstrap ───────────────────────────────────────
 Log.Logger = new LoggerConfiguration()
@@ -116,11 +121,20 @@ try
     builder.Services.AddScoped<IDungeonService, DungeonService>();
     builder.Services.AddScoped<IStoryService, StoryService>();
 
+    // Phase 6 — Entertainment
+    builder.Services.AddScoped<ICasinoService, CasinoService>();
+    builder.Services.AddScoped<IMiniGameService, MiniGameService>();
+    builder.Services.AddScoped<IMountRaceService, MountRaceService>();
+    builder.Services.AddScoped<IFashionService, FashionService>();
+    builder.Services.AddScoped<IPerformanceService, PerformanceService>();
+    builder.Services.AddScoped<IPhotoService, PhotoService>();
+
     // ─── Background Services ─────────────────────────────────
     builder.Services.AddHostedService<WorldTimeBackgroundService>();
     builder.Services.AddHostedService<DailyResetService>();
     builder.Services.AddHostedService<EconomyBackgroundService>();
     builder.Services.AddHostedService<WorldBackgroundService>();
+    builder.Services.AddHostedService<EntertainmentBackgroundService>();
 
     // ─── Rate Limiting ───────────────────────────────────────
     builder.Services.AddRateLimiter(opt =>

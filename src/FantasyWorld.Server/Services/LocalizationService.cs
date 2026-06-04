@@ -88,8 +88,30 @@ public class LocalizationService : ILocalizationService
         ["error.bad_request"]       = ("Yêu cầu không hợp lệ",              "Invalid request"),
         ["error.rate_limit"]        = ("Quá nhiều yêu cầu, vui lòng chờ",   "Too many requests, please wait"),
 
-        // Quest
-        ["quest.accepted"]           = ("Đã nhận nhiệm vụ: {name}",           "Quest accepted: {name}"),
+        // Casino
+        ["casino.won"]               = ("🎰 Thắng! Nhận được {payout} vàng",  "🎰 Won! Got {payout} gold"),
+        ["casino.lost"]              = ("Thua {amount} vàng",                   "Lost {amount} gold"),
+        ["casino.daily_limit"]       = ("Đã đạt giới hạn cược hàng ngày",      "Daily bet limit reached"),
+
+        // Performance
+        ["perf.started"]             = ("🎵 Đã bắt đầu biểu diễn!",           "🎵 Performance started!"),
+        ["perf.ended"]               = ("Biểu diễn kết thúc. Tips: {tips} vàng","Performance ended. Tips: {tips} gold"),
+        ["perf.tip_sent"]            = ("Đã tặng {amount} cho {name}",          "Sent {amount} to {name}"),
+        ["perf.stage_busy"]          = ("Sân khấu đang có người biểu diễn",     "Stage is currently occupied"),
+
+        // Fashion
+        ["fashion.bought"]           = ("Đã mua {name}",                        "Purchased {name}"),
+        ["fashion.worn"]             = ("Đang mặc {name}",                      "Now wearing {name}"),
+        ["fashion.preset_saved"]     = ("Đã lưu bộ trang phục {name}",          "Outfit preset '{name}' saved"),
+        ["fashion.design_submitted"] = ("Đã gửi thiết kế để duyệt",             "Design submitted for review"),
+        ["fashion.design_approved"]  = ("✅ Thiết kế {name} đã được duyệt!",   "✅ Design {name} approved!"),
+        ["fashion.royalty"]          = ("💰 Hoa hồng: {amount} vàng",          "💰 Royalty: {amount} gold"),
+
+        // Race
+        ["race.joined"]              = ("Đã tham gia đua thú!",                 "Joined the mount race!"),
+        ["race.started"]             = ("🏁 Đua bắt đầu!",                     "🏁 Race started!"),
+        ["race.finished"]            = ("🏆 Kết quả: hạng {pos}",              "🏆 Finished in position {pos}"),
+        ["race.cooldown"]            = ("Đã đang trong cuộc đua khác",          "Already in another race"),
         ["quest.completed"]          = ("✅ Hoàn thành nhiệm vụ: {name}!",     "✅ Quest completed: {name}!"),
         ["quest.objectives_incomplete"] = ("Chưa hoàn thành tất cả mục tiêu", "Not all objectives complete"),
         ["quest.abandoned"]          = ("Đã bỏ nhiệm vụ",                      "Quest abandoned"),
