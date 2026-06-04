@@ -1,0 +1,129 @@
+# deploy/docker-compose.yml
+# Fantasy World Game — Full Stack
+# Usage: docker-compose up -d
+version: "3.9"
+
+services:
+
+  # ─── MySQL 8 ─────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: fw_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-fw_secret_2024}
+      MYSQL_DATABASE:      fantasy_game
+      MYSQL_USER:          fw_user
+      MYSQL_PASSWORD:      ${MYSQL_PASSWORD:-fw_pass_2024}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./scripts/init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+    ports:
+      - "3306:3306"
+    networks:
+      - fw_net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+
+  # ─── Redis (session cache, pub/sub) ──────────────────────
+  redis:
+    image: redis:7-alpine
+    container_name: fw_redis
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-fw_redis_2024}
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - fw_net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+
+  # ─── Game Server ─────────────────────────────────────────
+  game_server:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.server
+    container_name: fw_game_server
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT:    Production
+      ASPNETCORE_URLS:           http://+:3000
+      ConnectionStrings__DefaultConnection: >
+        Server=mysql;Database=fantasy_game;
+        User=fw_user;Password=${MYSQL_PASSWORD:-fw_pass_2024};
+        CharSet=utf8mb4;
+      Auth__JwtSecret:          ${JWT_SECRET:-change_this_in_production_min64chars}
+      Auth__JwtRefreshSecret:   ${JWT_REFRESH_SECRET:-change_refresh_secret_64chars}
+      Auth__JwtExpiresDays:     "7"
+      Auth__BcryptRounds:       "12"
+      Game__RealMinutesPerDay:  "60"
+      Redis__ConnectionString:  redis:6379,password=${REDIS_PASSWORD:-fw_redis_2024}
+    ports:
+      - "3000:3000"
+    networks:
+      - fw_net
+    volumes:
+      - server_logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ─── J2ME Gateway ────────────────────────────────────────
+  j2me_gateway:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile.j2me
+    container_name: fw_j2me_gateway
+    restart: unless-stopped
+    depends_on:
+      game_server:
+        condition: service_healthy
+    environment:
+      J2me__TcpPort:        "7777"
+      J2me__GameServerUrl:  http://game_server:3000
+    ports:
+      - "7777:7777"
+    networks:
+      - fw_net
+    volumes:
+      - j2me_logs:/app/logs
+
+  # ─── Nginx Reverse Proxy ─────────────────────────────────
+  nginx:
+    image: nginx:alpine
+    container_name: fw_nginx
+    restart: unless-stopped
+    depends_on:
+      - game_server
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    networks:
+      - fw_net
+
+volumes:
+  mysql_data:
+  redis_data:
+  server_logs:
+  j2me_logs:
+  nginx_logs:
+
+networks:
+  fw_net:
+    driver: bridge

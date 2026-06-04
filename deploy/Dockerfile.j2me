@@ -1,0 +1,23 @@
+# deploy/Dockerfile.j2me
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+COPY src/FantasyWorld.Shared/FantasyWorld.Shared.csproj           src/FantasyWorld.Shared/
+COPY src/FantasyWorld.J2meGateway/FantasyWorld.J2meGateway.csproj src/FantasyWorld.J2meGateway/
+RUN dotnet restore src/FantasyWorld.J2meGateway/FantasyWorld.J2meGateway.csproj
+
+COPY src/FantasyWorld.Shared/     src/FantasyWorld.Shared/
+COPY src/FantasyWorld.J2meGateway/ src/FantasyWorld.J2meGateway/
+
+RUN dotnet publish src/FantasyWorld.J2meGateway/FantasyWorld.J2meGateway.csproj \
+    -c Release -o /app/publish --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+RUN mkdir -p /app/logs && chmod 777 /app/logs
+COPY --from=build /app/publish .
+RUN adduser --disabled-password --gecos "" appuser && chown -R appuser /app
+USER appuser
+
+EXPOSE 7777
+ENTRYPOINT ["dotnet", "FantasyWorld.J2meGateway.dll"]

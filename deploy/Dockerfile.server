@@ -1,0 +1,35 @@
+# deploy/Dockerfile.server
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Restore dependencies (cache layer)
+COPY src/FantasyWorld.Shared/FantasyWorld.Shared.csproj       src/FantasyWorld.Shared/
+COPY src/FantasyWorld.Server/FantasyWorld.Server.csproj       src/FantasyWorld.Server/
+RUN dotnet restore src/FantasyWorld.Server/FantasyWorld.Server.csproj
+
+# Copy source and build
+COPY src/FantasyWorld.Shared/ src/FantasyWorld.Shared/
+COPY src/FantasyWorld.Server/ src/FantasyWorld.Server/
+
+RUN dotnet publish src/FantasyWorld.Server/FantasyWorld.Server.csproj \
+    -c Release -o /app/publish \
+    --no-restore
+
+# ─── Runtime image ────────────────────────────────────────
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
+WORKDIR /app
+
+# Install curl for healthcheck
+RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
+
+# Create logs directory
+RUN mkdir -p /app/logs && chmod 777 /app/logs
+
+COPY --from=build /app/publish .
+
+# Non-root user for security
+RUN adduser --disabled-password --gecos "" appuser && chown -R appuser /app
+USER appuser
+
+EXPOSE 3000
+ENTRYPOINT ["dotnet", "FantasyWorld.Server.dll"]
