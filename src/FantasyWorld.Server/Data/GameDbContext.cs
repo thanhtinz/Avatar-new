@@ -109,6 +109,28 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
     public DbSet<Monster>               Monsters               => Set<Monster>();
     public DbSet<BattleLog>             BattleLogs             => Set<BattleLog>();
 
+    // Content - Phase 5
+    public DbSet<QuestObjective>              QuestObjectives              => Set<QuestObjective>();
+    public DbSet<QuestReward>                 QuestRewards                 => Set<QuestReward>();
+    public DbSet<QuestPrerequisite>           QuestPrerequisites           => Set<QuestPrerequisite>();
+    public DbSet<CharacterQuestObjective>     CharacterQuestObjectives     => Set<CharacterQuestObjective>();
+    public DbSet<AcademyExam>                 AcademyExams                 => Set<AcademyExam>();
+    public DbSet<AcademyExamResult>           AcademyExamResults           => Set<AcademyExamResult>();
+    public DbSet<AcademyTournament>           AcademyTournaments           => Set<AcademyTournament>();
+    public DbSet<AcademyTournamentParticipant> AcademyTournamentParticipants => Set<AcademyTournamentParticipant>();
+    public DbSet<DungeonFloor>                DungeonFloors                => Set<DungeonFloor>();
+    public DbSet<DungeonCooldown>             DungeonCooldowns             => Set<DungeonCooldown>();
+    public DbSet<StoryChapter>                StoryChapters                => Set<StoryChapter>();
+    public DbSet<StoryNode>                   StoryNodes                   => Set<StoryNode>();
+    public DbSet<CharacterStoryProgress>      CharacterStoryProgress       => Set<CharacterStoryProgress>();
+    public DbSet<CharacterStoryEnding>        CharacterStoryEndings        => Set<CharacterStoryEnding>();
+    public DbSet<Title>                       Titles                       => Set<Title>();
+    public DbSet<CharacterTitle>              CharacterTitles              => Set<CharacterTitle>();
+    public DbSet<Achievement>                 Achievements                 => Set<Achievement>();
+    public DbSet<CharacterAchievement>        CharacterAchievements        => Set<CharacterAchievement>();
+    public DbSet<CharacterReputation>         CharacterReputations         => Set<CharacterReputation>();
+    public DbSet<CharacterCard>               CharacterCards               => Set<CharacterCard>();
+
     protected override void OnModelCreating(ModelBuilder mb)
     {
         base.OnModelCreating(mb);
@@ -602,6 +624,146 @@ public class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(
             e.HasIndex(b => new { b.AttackerId, b.FoughtAt });
             e.HasOne(b => b.Attacker).WithMany()
              .HasForeignKey(b => b.AttackerId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        // ─── Phase 5: Content ────────────────────────────────
+
+        mb.Entity<QuestObjective>(e =>
+        {
+            e.HasOne(o => o.Quest).WithMany()
+             .HasForeignKey(o => o.QuestId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<QuestReward>(e =>
+        {
+            e.HasOne(r => r.Quest).WithMany()
+             .HasForeignKey(r => r.QuestId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<QuestPrerequisite>(e =>
+        {
+            e.HasOne(p => p.Quest).WithMany()
+             .HasForeignKey(p => p.QuestId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<CharacterQuestObjective>(e =>
+        {
+            e.HasOne(cqo => cqo.CharQuest).WithMany(cq => cq.Objectives)
+             .HasForeignKey(cqo => cqo.CharQuestId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(cqo => cqo.Objective).WithMany()
+             .HasForeignKey(cqo => cqo.ObjectiveId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<AcademyExam>(e =>
+        {
+            e.HasOne(ex => ex.Academy).WithMany()
+             .HasForeignKey(ex => ex.AcademyId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<AcademyExamResult>(e =>
+        {
+            e.HasIndex(r => new { r.CharacterId, r.ExamId, r.TakenAt });
+            e.HasOne(r => r.Character).WithMany()
+             .HasForeignKey(r => r.CharacterId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(r => r.Exam).WithMany(ex => ex.Results)
+             .HasForeignKey(r => r.ExamId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<AcademyTournament>(e =>
+        {
+            e.HasOne(t => t.AcademyA).WithMany()
+             .HasForeignKey(t => t.AcademyAId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(t => t.AcademyB).WithMany()
+             .HasForeignKey(t => t.AcademyBId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<AcademyTournamentParticipant>(e =>
+        {
+            e.HasOne(p => p.Tournament).WithMany()
+             .HasForeignKey(p => p.TournamentId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(p => p.Character).WithMany()
+             .HasForeignKey(p => p.CharacterId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<DungeonFloor>(e =>
+        {
+            e.HasOne(f => f.Dungeon).WithMany()
+             .HasForeignKey(f => f.DungeonId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<DungeonCooldown>(e =>
+        {
+            e.HasIndex(cd => new { cd.CharacterId, cd.DungeonId });
+            e.HasOne(cd => cd.Character).WithMany()
+             .HasForeignKey(cd => cd.CharacterId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(cd => cd.Dungeon).WithMany()
+             .HasForeignKey(cd => cd.DungeonId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<StoryChapter>(e =>
+        {
+            e.HasOne(c => c.PrereqChapter).WithMany()
+             .HasForeignKey(c => c.PrereqChapterId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<StoryNode>(e =>
+        {
+            e.HasOne(n => n.Chapter).WithMany(c => c.Nodes)
+             .HasForeignKey(n => n.ChapterId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(n => n.Npc).WithMany()
+             .HasForeignKey(n => n.NpcId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<CharacterStoryProgress>(e =>
+        {
+            e.HasIndex(p => new { p.CharacterId, p.ChapterId }).IsUnique();
+            e.HasOne(p => p.Character).WithMany()
+             .HasForeignKey(p => p.CharacterId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(p => p.Chapter).WithMany(c => c.Progress)
+             .HasForeignKey(p => p.ChapterId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne(p => p.CurrentNode).WithMany()
+             .HasForeignKey(p => p.CurrentNodeId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<CharacterStoryEnding>(e =>
+        {
+            e.HasIndex(e2 => new { e2.CharacterId, e2.EndingId });
+            e.HasOne(e2 => e2.Character).WithMany()
+             .HasForeignKey(e2 => e2.CharacterId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        mb.Entity<CharacterTitle>(e =>
+        {
+            e.HasIndex(ct => new { ct.CharacterId, ct.TitleId }).IsUnique();
+            e.HasOne(ct => ct.Character).WithMany()
+             .HasForeignKey(ct => ct.CharacterId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(ct => ct.Title).WithMany(t => t.CharacterTitles)
+             .HasForeignKey(ct => ct.TitleId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<CharacterAchievement>(e =>
+        {
+            e.HasIndex(ca => new { ca.CharacterId, ca.AchievementId }).IsUnique();
+            e.HasOne(ca => ca.Character).WithMany()
+             .HasForeignKey(ca => ca.CharacterId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(ca => ca.Achievement).WithMany()
+             .HasForeignKey(ca => ca.AchievementId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<CharacterReputation>(e =>
+        {
+            e.HasIndex(r => new { r.CharacterId, r.RegionId }).IsUnique();
+            e.HasOne(r => r.Character).WithMany()
+             .HasForeignKey(r => r.CharacterId).OnDelete(DeleteBehavior.Cascade);
+            e.HasOne(r => r.Region).WithMany()
+             .HasForeignKey(r => r.RegionId).OnDelete(DeleteBehavior.Restrict);
+        });
+
+        mb.Entity<CharacterCard>(e =>
+        {
+            e.HasIndex(cc => new { cc.CharacterId, cc.CardId }).IsUnique();
+            e.HasOne(cc => cc.Character).WithMany()
+             .HasForeignKey(cc => cc.CharacterId).OnDelete(DeleteBehavior.Cascade);
         });
     }
 }

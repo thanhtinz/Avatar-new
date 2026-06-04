@@ -110,6 +110,12 @@ try
     builder.Services.AddScoped<IWorldEventService, WorldEventService>();
     builder.Services.AddScoped<INpcAiService, NpcAiService>();
 
+    // Phase 5 — Content Systems
+    builder.Services.AddScoped<IQuestService, QuestService>();
+    builder.Services.AddScoped<IAcademyService, AcademyService>();
+    builder.Services.AddScoped<IDungeonService, DungeonService>();
+    builder.Services.AddScoped<IStoryService, StoryService>();
+
     // ─── Background Services ─────────────────────────────────
     builder.Services.AddHostedService<WorldTimeBackgroundService>();
     builder.Services.AddHostedService<DailyResetService>();

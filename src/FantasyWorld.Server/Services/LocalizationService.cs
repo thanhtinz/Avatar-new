@@ -88,8 +88,26 @@ public class LocalizationService : ILocalizationService
         ["error.bad_request"]       = ("Yêu cầu không hợp lệ",              "Invalid request"),
         ["error.rate_limit"]        = ("Quá nhiều yêu cầu, vui lòng chờ",   "Too many requests, please wait"),
 
-        // Fishing
-        ["fishing.caught"]          = ("🐟 Câu được {name} ({weight}kg)!",    "🐟 Caught {name} ({weight}kg)!"),
+        // Quest
+        ["quest.accepted"]           = ("Đã nhận nhiệm vụ: {name}",           "Quest accepted: {name}"),
+        ["quest.completed"]          = ("✅ Hoàn thành nhiệm vụ: {name}!",     "✅ Quest completed: {name}!"),
+        ["quest.objectives_incomplete"] = ("Chưa hoàn thành tất cả mục tiêu", "Not all objectives complete"),
+        ["quest.abandoned"]          = ("Đã bỏ nhiệm vụ",                      "Quest abandoned"),
+
+        // Academy
+        ["academy.enrolled"]         = ("Đã gia nhập {name}!",                 "Joined {name}!"),
+        ["academy.exam_passed"]      = ("✅ Đậu kỳ thi! Điểm: {score}/100",   "✅ Exam passed! Score: {score}/100"),
+        ["academy.exam_failed"]      = ("❌ Trượt kỳ thi. Điểm: {score}/100", "❌ Exam failed. Score: {score}/100"),
+        ["academy.grade_up"]         = ("🎓 Lên bậc {grade} trong học viện!", "🎓 Reached grade {grade}!"),
+
+        // Story
+        ["story.chapter_started"]    = ("Bắt đầu chương: {title}",             "Chapter started: {title}"),
+        ["story.chapter_completed"]  = ("📖 Hoàn thành chương: {title}!",      "📖 Chapter completed: {title}!"),
+        ["story.new_ending"]         = ("✨ Kết thúc mới: {ending}",           "✨ New ending: {ending}"),
+
+        // Title
+        ["title.unlocked"]           = ("🏅 Danh hiệu mới: {name}",           "🏅 New title: {name}"),
+        ["achievement.unlocked"]     = ("🏆 Thành tích: {name}",              "🏆 Achievement: {name}"),
         ["fishing.escaped"]         = ("Con cá đã thoát mất!",                 "The fish got away!"),
         ["fishing.nothing"]         = ("Không có gì cắn câu...",               "Nothing biting..."),
         ["fishing.record"]          = ("🏆 Kỷ lục mới! {name} {weight}kg",    "🏆 New record! {name} {weight}kg"),
